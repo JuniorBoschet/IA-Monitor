@@ -2,13 +2,20 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CadChatController;
+use App\Http\Controllers\AuthController;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::middleware(['auth:api'])->get('/user', function (Request $request) {
+    return JWTAuth::parseToken()->authenticate();
+});
 
-
+Route::controller(AuthController::class)->group(static function () {
+    Route::post('user/register', 'register');  
+    Route::post('user/login', 'login');  
+    Route::post('user/logout', 'logout')->middleware('auth:api');  
+    Route::post('user/refresh', 'refresh');  
+    Route::get('user/me', 'me')->middleware('auth:api');  
+});
 
 Route::controller(CadChatController::class)->group(static function ()
 {
